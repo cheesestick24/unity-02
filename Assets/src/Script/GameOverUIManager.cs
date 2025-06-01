@@ -5,7 +5,6 @@ using UnityEngine.SceneManagement; // シーン管理のために必要
 public class GameOverUIManager : MonoBehaviour
 {
     public GameObject gameOverPanel;
-    public TMPro.TextMeshProUGUI scoreText;
     private GameManager gameManager;
     private RankingManager rankingManager;
 
@@ -32,16 +31,25 @@ public class GameOverUIManager : MonoBehaviour
         }
     }
 
+    void Update()
+    {
+        // ゲームオーバーUIが表示されているときは、入力を無視する
+        if (gameOverPanel != null && gameOverPanel.activeSelf)
+        {
+            // スペースキーを押すとコンティニューボタンがクリックされたとみなす
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                OnContinueButtonClicked();
+            }
+        }
+    }
+
     // ゲームオーバーUIを表示する関数
     public void ShowGameOverUI(int brokenBlocks)
     {
         if (gameOverPanel != null)
         {
             gameOverPanel.SetActive(true);
-        }
-        if (scoreText != null)
-        {
-            scoreText.text = "壊したブロック数: " + brokenBlocks;
         }
         Time.timeScale = 0f; // ゲーム内の時間を停止
 
