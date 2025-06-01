@@ -10,6 +10,8 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
     // ブロックのプレハブ
     public GameObject blockPrefab;
+    public GameObject startCountPanel;
+
     // GameOverUIManagerの参照
     private GameOverUIManager uiManager;
     private BallController ballController;
@@ -88,6 +90,7 @@ public class GameManager : MonoBehaviour
     IEnumerator StartGameCountdown()
     {
         isGameActive = false; // ゲーム進行フラグをオフにする
+        startCountPanel.SetActive(true);
 
         // カウントダウンテキストを有効にする
         if (countdownText != null)
@@ -110,6 +113,8 @@ public class GameManager : MonoBehaviour
         {
             countdownText.gameObject.SetActive(false);
         }
+
+        startCountPanel.SetActive(false);
 
         isGameActive = true;
         Debug.Log("ゲームスタート！");
@@ -180,6 +185,7 @@ public class GameManager : MonoBehaviour
     }
     public void RestartGame()
     {
+        Debug.Log("RestartGame関数が呼ばれました！");
         Time.timeScale = 1f;
         brokenBlockCount = 0;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);

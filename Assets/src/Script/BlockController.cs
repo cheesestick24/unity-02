@@ -8,7 +8,6 @@ public class BlockController : MonoBehaviour
         if (collision.gameObject.CompareTag("Ball"))
         {
             GameManager.brokenBlockCount++;
-            Debug.Log("Broken Block Count: " + GameManager.brokenBlockCount);
             Destroy(gameObject);
         }
     }

@@ -33,7 +33,6 @@ public class BallController : MonoBehaviour
         Vector3 initialDirection = new Vector3(randomX, 0, 1).normalized;
 
         rb.linearVelocity = initialDirection * fixedSpeed;
-        Debug.Log("Ball Launched with speed: " + rb.linearVelocity.magnitude);
     }
 
     void FixedUpdate()
