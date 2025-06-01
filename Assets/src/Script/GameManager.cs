@@ -1,37 +1,21 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 
 public class GameManager : MonoBehaviour
 {
-    // コルーチンを使用するために必要
     public static GameManager Instance { get; private set; }
-    // ブロックのプレハブ
-    public GameObject blockPrefab;
     public GameObject startCountPanel;
 
-    // GameOverUIManagerの参照
     private GameOverUIManager uiManager;
     private BallController ballController;
+    private BlockGenerator blockGenerator;
+
     // ゲーム時間
     private float timer = 0f;
-    // ブロックの横の数
-    private int blocksPerRow = 15;
-    // ブロックの間隔
-    private float blockSpacingX = 1.1f;
-    // ブロックの生成開始位置
-    private float startX = -7.8f;
-    private float startY = 0f;
-    private float startZ = 4f;
-
     // ブロック生成間隔（秒）
     private float blockGenerationInterval = 10f;
-    // ブロックの落下速度
-    public float blockSlideSpeed = 0.1f;
-    // 現在のブロックのリスト
-    private List<GameObject> currentBlocks = new List<GameObject>();
 
     /// <summary>
     /// 壊したブロックの数
@@ -40,7 +24,7 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// ゲーム開始前のカウントダウンテキスト
     /// </summary>
-    public TMPro.TextMeshProUGUI countdownText;
+    public TextMeshProUGUI countdownText;
     /// <summary>
     /// ゲーム開始前のカウントダウン時間（秒）
     /// </summary>
@@ -75,7 +59,6 @@ public class GameManager : MonoBehaviour
     {
         brokenBlockCount = 0;
         Time.timeScale = 1f;
-
         timer = 0f;
 
         StartCoroutine(StartGameCountdown());
@@ -85,8 +68,23 @@ public class GameManager : MonoBehaviour
         {
             Debug.LogError("UIManagerが見つかりません。シーンにUIManagerオブジェクトがあるか確認してください。");
         }
+
+        ballController = FindAnyObjectByType<BallController>();
+        if (ballController == null)
+        {
+            Debug.LogError("BallControllerが見つかりません。シーンにBallControllerオブジェクトがあるか確認してください。");
+        }
+
+        blockGenerator = FindAnyObjectByType<BlockGenerator>();
+        if (blockGenerator == null)
+        {
+            Debug.LogError("BlockGeneratorが見つかりません。シーンにBlockGeneratorオブジェクトがあるか確認してください。");
+        }
     }
 
+    /// <summary>
+    /// ゲーム開始前のカウントダウンを行います。
+    /// </summary>
     IEnumerator StartGameCountdown()
     {
         isGameActive = false; // ゲーム進行フラグをオフにする
@@ -119,10 +117,8 @@ public class GameManager : MonoBehaviour
         isGameActive = true;
         Debug.Log("ゲームスタート！");
 
-        ballController = FindAnyObjectByType<BallController>();
-        ballController.LaunchBall();
-
-        GenerateNewBlockRow();
+        ballController.LaunchBall(); // BallControllerにボールを発射させる
+        blockGenerator.GenerateNewBlockRow(); // BlockGeneratorに最初のブロック行を生成させる
     }
 
     void Update()
@@ -133,59 +129,25 @@ public class GameManager : MonoBehaviour
 
         if (timer >= blockGenerationInterval)
         {
-            GenerateNewBlockRow();
+            if (blockGenerator != null)
+            {
+                blockGenerator.GenerateNewBlockRow(); // BlockGeneratorに新しいブロック行を生成させる
+            }
             timer = 0f;
         }
 
-        MoveExistingBlocksForward();
-    }
-
-
-    void GenerateNewBlockRow()
-    {
-        if (blockPrefab == null)
+        if (blockGenerator != null)
         {
-            Debug.LogError("ブロックのプレハブが設定されていません！GameManagerのインスペクターで設定してください。");
-            return;
-        }
-
-        for (int i = 0; i < blocksPerRow; i++)
-        {
-            Vector3 spawnPosition = new Vector3(
-                startX + (i * blockSpacingX),
-                startY,
-                startZ
-            );
-            GameObject newBlock = Instantiate(blockPrefab, spawnPosition, Quaternion.identity);
-            Renderer blockRenderer = newBlock.GetComponent<Renderer>();
-            if (blockRenderer != null)
-            {
-                blockRenderer.material.color = new Color(Random.value, Random.value, Random.value, 1f);
-            }
-            currentBlocks.Add(newBlock);
-
-        }
-        Debug.Log("新しいブロックの行が生成されました！");
-    }
-
-    void MoveExistingBlocksForward()
-    {
-        for (int i = currentBlocks.Count - 1; i >= 0; i--)
-        {
-            GameObject block = currentBlocks[i];
-            if (block != null)
-            {
-                block.transform.position += Vector3.forward * -blockSlideSpeed * Time.deltaTime;
-            }
-            else
-            {
-                currentBlocks.RemoveAt(i);
-            }
+            blockGenerator.MoveExistingBlocksForward(); // 既存のブロックを前方に移動させる
         }
     }
+
+    /// <summary>
+    /// ゲームを再スタートします。
+    /// </summary>
     public void RestartGame()
     {
-        Debug.Log("RestartGame関数が呼ばれました！");
+        Debug.Log("ゲームを再スタートします。");
         Time.timeScale = 1f;
         brokenBlockCount = 0;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
