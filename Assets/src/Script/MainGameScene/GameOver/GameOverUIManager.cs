@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEditor;
 using TMPro;
 
 public class GameOverUIManager : MonoBehaviour
@@ -58,7 +59,9 @@ public class GameOverUIManager : MonoBehaviour
         }
     }
 
-    // コンティニューボタンが押されたときに呼ばれる関数
+    /// <summary>
+    /// コンティニューボタンが押されたときに呼ばれる関数
+    /// </summary>
     public void OnContinueButtonClicked()
     {
         // UIManager自身のUIを非表示にする
@@ -78,5 +81,27 @@ public class GameOverUIManager : MonoBehaviour
             Time.timeScale = 1f; // 時間を戻す
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
+    }
+
+    /// <summary>
+    /// 終了ボタンが押されたときに呼ばれる関数
+    /// </summary>
+    public void OnExitButtonClicked()
+    {
+        // UIManager自身のUIを非表示にする (必要であれば)
+        if (gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(false);
+        }
+
+        // ゲームを終了する
+#if UNITY_EDITOR
+        // Unityエディターで実行中の場合
+        EditorApplication.isPlaying = false;
+        Debug.Log("エディターでの再生を停止しました。");
+#else
+        // ビルドされたアプリケーションで実行中の場合
+        Application.Quit();
+#endif
     }
 }
