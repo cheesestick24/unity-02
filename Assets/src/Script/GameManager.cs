@@ -131,7 +131,7 @@ public class GameManager : MonoBehaviour
         {
             if (blockGenerator != null)
             {
-                blockGenerator.GenerateNewBlockRow(); // BlockGeneratorに新しいブロック行を生成させる
+                blockGenerator.GenerateNewBlockRow(true); // BlockGeneratorに新しいブロック行を生成させる
             }
             timer = 0f;
         }
