@@ -52,5 +52,10 @@ public class BallController : MonoBehaviour
         {
             rb.linearVelocity = rb.linearVelocity.normalized * fixedSpeed;
         }
+
+        // ボールの位置をY軸で0に制限する
+        Vector3 pos = rb.position;
+        pos.y = 0f;
+        rb.position = pos;
     }
 }
