@@ -14,9 +14,6 @@ public class RankingDisplayManager : MonoBehaviour
     // 現在のランキングデータを保持するリスト
     private List<RankingData> currentRankings = new List<RankingData>();
 
-    [Header("Test Data")] // Inspectorでの表示カテゴリ
-    public RankingData[] initialTestRankingData; // Inspectorで設定可能な配列
-
     // ファイル保存関連
     private const string RANKING_FILE_NAME = "ranking.json"; // ファイル名 (パスはJsonDataSaverで結合)
     private const int MAX_RANKING_COUNT = 10;
@@ -31,56 +28,8 @@ public class RankingDisplayManager : MonoBehaviour
         DisplayRankings(currentRankings.ToArray()); // ロードしたデータ、または初期データでUI表示
     }
 
-    [ContextMenu("Display Test Rankings in Editor")] // Unityエディタのコンポーネント右クリックメニューに追加
-    public void Editor_DisplayTestRankings()
-    {
-        Debug.Log("エディタでテストランキングを表示します。");
-        // 既存のリスト項目をクリア (念のため)
-        foreach (Transform child in rankingListParent)
-        {
-            // エディタモードなので DestroyImmediate を使用します。
-            // 実行時（ゲームプレイ中）に Destroy を使用するのと異なります。
-            DestroyImmediate(child.gameObject);
-        }
-
-        // initialTestRankingData が設定されていればそれを使う
-        if (initialTestRankingData != null && initialTestRankingData.Length > 0)
-        {
-            currentRankings.Clear(); // これまでのデータをクリア
-            currentRankings.AddRange(initialTestRankingData);
-        }
-        else
-        {
-            // 設定がなければダミーデータを生成
-            currentRankings = new List<RankingData>
-        {
-            new RankingData { gameTime = 60.123f, score = 100, rank = 1 },
-            new RankingData { gameTime = 90.456f, score = 80, rank = 2 },
-            new RankingData { gameTime = 120.789f, score = 10, rank = 3 }
-        };
-            Debug.LogWarning("initialTestRankingData が設定されていないため、ダミーデータを生成しました。");
-        }
-
-        // ソートは既に行われていると仮定するか、ここで再度ソートしても良い
-        SortAndTruncateRankings(); // 順位の再割り当てを含む
-
-        // UIを更新
-        DisplayRankings(currentRankings.ToArray());
-    }
-
-    [ContextMenu("Clear Rankings in Editor")] // Unityエディタのコンポーネント右クリックメニューに追加
-    public void Editor_ClearRankings()
-    {
-        Debug.Log("エディタのランキング表示をクリアします。");
-        foreach (Transform child in rankingListParent)
-        {
-            DestroyImmediate(child.gameObject);
-        }
-        currentRankings.Clear(); // データもクリア
-    }
-
     [ContextMenu("Reset Rankings Data")]
-    public void ResetRankingsData()
+    private void ResetRankingsData()
     {
         currentRankings.Clear();
         SaveRankings();

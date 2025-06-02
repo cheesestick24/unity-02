@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
 using TMPro;
-using System;
 
 public class GameManager : MonoBehaviour
 {
@@ -22,10 +21,15 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// 壊したブロックの数
     /// </summary>
+    [HideInInspector]
     public static int brokenBlockCount = 0;
 
     private float gameStartTime = 0f;
     private float gameEndTime = 0f;
+    /// <summary>
+    /// ゲームの実施時間
+    /// </summary>
+    [HideInInspector]
     public float GameDuration => gameEndTime - gameStartTime;
 
     /// <summary>
@@ -157,30 +161,20 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ゲームを終了します。
+    /// ゲームオーバーを処理します。
     /// </summary>
     public void GameOver()
     {
         if (!isGameActive) return;
 
-        isGameActive = false; // ゲーム進行フラグをオフにする
+        Time.timeScale = 0f; // ゲーム内の時間を停止
         gameEndTime = Time.time; // ゲーム終了時間を記録
+        isGameActive = false; // ゲーム進行フラグをオフにする
 
         Debug.Log("ゲーム終了！");
 
-        // ランキングにスコアを追加
-        rankingDisplayManager.AddScoreToRanking(GameDuration, brokenBlockCount);
-
         // gameOverUIManagerにゲームオーバーUIの表示を依頼
-        if (gameOverUIManager != null)
-        {
-            gameOverUIManager.ShowGameOverUI(brokenBlockCount);
-        }
-        else
-        {
-            Time.timeScale = 0f; // ゲームを停止
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name); // シーンを再読み込み
-        }
+        gameOverUIManager.ShowGameOverUI();
     }
 
     /// <summary>

@@ -1,12 +1,14 @@
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.SceneManagement; // シーン管理のために必要
+using UnityEngine.SceneManagement;
+using TMPro;
 
 public class GameOverUIManager : MonoBehaviour
 {
     public GameObject gameOverPanel;
     private GameManager gameManager;
-    private RankingManager rankingManager;
+    private RankingDisplayManager rankingDisplayManager;
+
+    public TextMeshProUGUI scoreText;
 
     void Start()
     {
@@ -22,18 +24,16 @@ public class GameOverUIManager : MonoBehaviour
         {
             Debug.LogError("GameManagerが見つかりません。シーンにGameManagerオブジェクトがあるか確認してください。");
         }
-
-        // RankingManagerインスタンスを取得
-        rankingManager = FindAnyObjectByType<RankingManager>();
-        if (rankingManager == null)
+        rankingDisplayManager = FindAnyObjectByType<RankingDisplayManager>();
+        if (rankingDisplayManager == null)
         {
-            Debug.LogError("RankingManagerが見つかりません。シーンにRankingManagerオブジェクトがあるか確認してください。");
+            Debug.LogError("RankingDisplayManagerが見つかりません。シーンにRankingDisplayManagerオブジェクトがあるか確認してください。");
         }
     }
 
     void Update()
     {
-        // ゲームオーバーUIが表示されているときは、入力を無視する
+        // ゲームオーバーUIが表示されている場合のみ、スペースキーの入力をチェック
         if (gameOverPanel != null && gameOverPanel.activeSelf)
         {
             // スペースキーを押すとコンティニューボタンがクリックされたとみなす
@@ -45,17 +45,16 @@ public class GameOverUIManager : MonoBehaviour
     }
 
     // ゲームオーバーUIを表示する関数
-    public void ShowGameOverUI(int brokenBlocks)
+    public void ShowGameOverUI()
     {
+        // ランキングにスコアを追加
+        rankingDisplayManager.AddScoreToRanking(gameManager.GameDuration, GameManager.brokenBlockCount);
+        // スコアを表示
+        scoreText.text = "Score " + GameManager.brokenBlockCount.ToString();
+
         if (gameOverPanel != null)
         {
             gameOverPanel.SetActive(true);
-        }
-        Time.timeScale = 0f; // ゲーム内の時間を停止
-
-        if (rankingManager != null)
-        {
-            rankingManager.AddNewScore(brokenBlocks);
         }
     }
 
