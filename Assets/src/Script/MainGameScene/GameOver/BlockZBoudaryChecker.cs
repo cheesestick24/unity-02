@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class BlockZBoundaryChecker : MonoBehaviour
 {
-    public float gameOverZThreshold;
+    private float gameOverZThreshold = -4.5f; // ゲームオーバーのZ座標閾値
     private GameOverUIManager uiManager;
 
     void Start()
@@ -13,11 +13,6 @@ public class BlockZBoundaryChecker : MonoBehaviour
         {
             Debug.LogError("UIManagerが見つかりません。シーンにUIManagerオブジェクトがあるか確認してください。");
         }
-        // gameOverZThreshold が未設定の場合のデバッグ用警告
-        if (gameOverZThreshold == 0f)
-        {
-            Debug.LogWarning("gameOverZThresholdが設定されていません。手動で設定するか、GameManagerから渡してください。");
-        }
     }
 
     void Update()
@@ -27,15 +22,7 @@ public class BlockZBoundaryChecker : MonoBehaviour
         {
             Debug.Log("ブロックが手前まで迫ってきた！ゲームオーバー！");
 
-            // UIManagerにゲームオーバーUIの表示を依頼
-            if (uiManager != null)
-            {
-                uiManager.ShowGameOverUI(GameManager.brokenBlockCount);
-            }
-            else
-            {
-                Time.timeScale = 0f; // 時間を停止
-            }
+            GameManager.Instance.GameOver();
         }
     }
 }

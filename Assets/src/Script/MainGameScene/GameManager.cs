@@ -2,15 +2,17 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
 using TMPro;
+using System;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
     public GameObject startCountPanel;
 
-    private GameOverUIManager uiManager;
+    private GameOverUIManager gameOverUIManager;
     private BallController ballController;
     private BlockGenerator blockGenerator;
+    private RankingDisplayManager rankingDisplayManager;
 
     // ゲーム時間
     private float timer = 0f;
@@ -21,6 +23,11 @@ public class GameManager : MonoBehaviour
     /// 壊したブロックの数
     /// </summary>
     public static int brokenBlockCount = 0;
+
+    private float gameStartTime = 0f;
+    private float gameEndTime = 0f;
+    public float GameDuration => gameEndTime - gameStartTime;
+
     /// <summary>
     /// ゲーム開始前のカウントダウンテキスト
     /// </summary>
@@ -35,7 +42,7 @@ public class GameManager : MonoBehaviour
     private bool isGameActive = false;
 
     /// <summary>
-    /// ゲーム進行フラグを設定します。
+    /// ゲーム進行フラグを取得します。
     /// </summary>
     /// <returns>isGameActive</returns>
     public bool IsGameActive()
@@ -63,10 +70,10 @@ public class GameManager : MonoBehaviour
 
         StartCoroutine(StartGameCountdown());
 
-        uiManager = FindAnyObjectByType<GameOverUIManager>();
-        if (uiManager == null)
+        gameOverUIManager = FindAnyObjectByType<GameOverUIManager>();
+        if (gameOverUIManager == null)
         {
-            Debug.LogError("UIManagerが見つかりません。シーンにUIManagerオブジェクトがあるか確認してください。");
+            Debug.LogError("GameOverUIManagerが見つかりません。シーンにGameOverUIManagerオブジェクトがあるか確認してください。");
         }
 
         ballController = FindAnyObjectByType<BallController>();
@@ -74,11 +81,15 @@ public class GameManager : MonoBehaviour
         {
             Debug.LogError("BallControllerが見つかりません。シーンにBallControllerオブジェクトがあるか確認してください。");
         }
-
         blockGenerator = FindAnyObjectByType<BlockGenerator>();
         if (blockGenerator == null)
         {
             Debug.LogError("BlockGeneratorが見つかりません。シーンにBlockGeneratorオブジェクトがあるか確認してください。");
+        }
+        rankingDisplayManager = FindAnyObjectByType<RankingDisplayManager>();
+        if (rankingDisplayManager == null)
+        {
+            Debug.LogError("RankingDisplayManagerが見つかりません。シーンにRankingDisplayManagerオブジェクトがあるか確認してください。");
         }
     }
 
@@ -112,7 +123,10 @@ public class GameManager : MonoBehaviour
             countdownText.gameObject.SetActive(false);
         }
 
+        // カウントダウンパネルを非表示にする
         startCountPanel.SetActive(false);
+        // ゲーム開始時間を記録
+        gameStartTime = Time.time;
 
         isGameActive = true;
         Debug.Log("ゲームスタート！");
@@ -139,6 +153,33 @@ public class GameManager : MonoBehaviour
         if (blockGenerator != null)
         {
             blockGenerator.MoveExistingBlocksForward(); // 既存のブロックを前方に移動させる
+        }
+    }
+
+    /// <summary>
+    /// ゲームを終了します。
+    /// </summary>
+    public void GameOver()
+    {
+        if (!isGameActive) return;
+
+        isGameActive = false; // ゲーム進行フラグをオフにする
+        gameEndTime = Time.time; // ゲーム終了時間を記録
+
+        Debug.Log("ゲーム終了！");
+
+        // ランキングにスコアを追加
+        rankingDisplayManager.AddScoreToRanking(GameDuration, brokenBlockCount);
+
+        // gameOverUIManagerにゲームオーバーUIの表示を依頼
+        if (gameOverUIManager != null)
+        {
+            gameOverUIManager.ShowGameOverUI(brokenBlockCount);
+        }
+        else
+        {
+            Time.timeScale = 0f; // ゲームを停止
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name); // シーンを再読み込み
         }
     }
 

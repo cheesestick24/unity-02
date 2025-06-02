@@ -134,4 +134,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01bff421454cd6f42ab85d6c61e573fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameOverZThreshold: -4.5
+  gameOverZThreshold: 0
