@@ -122,6 +122,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 004cd083789806646b11811d8ed26f14, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  breakSound: {fileID: 8300000, guid: b066057cd1635974faba7687afd86ece, type: 3}
+  audioPlayerPrefab: {fileID: 8526720488670454492, guid: 9a03d9301ac41a0409a09c5a76e1f6f2, type: 3}
+  time: 0.1
 --- !u!114 &-1523611460830307717
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -134,4 +137,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01bff421454cd6f42ab85d6c61e573fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameOverZThreshold: 0
