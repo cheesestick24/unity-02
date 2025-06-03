@@ -9,7 +9,7 @@ public class BallController : MonoBehaviour
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        rb.constraints = RigidbodyConstraints.FreezeRotationY;
+        rb.constraints = RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezePositionY;
 
         gameManager = GameManager.Instance;
         if (gameManager == null)
@@ -52,10 +52,5 @@ public class BallController : MonoBehaviour
         {
             rb.linearVelocity = rb.linearVelocity.normalized * fixedSpeed;
         }
-
-        // ボールの位置をY軸で0に制限する
-        Vector3 pos = rb.position;
-        pos.y = 0f;
-        rb.position = pos;
     }
 }
